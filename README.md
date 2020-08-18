@@ -8,6 +8,7 @@
 > Serial Port, COM  
 > Windows.Forms GUI (C# .NET) 
 
+<img src="./graphics/SP.ico" alt="compass" width="64" height="64">  
 <img src="./graphics/SP_COM_LRF_start.png" alt="SP_COM_LRF_start" width="300" height="440">  
 <img src="./graphics/SP_COM_LRF_open.png" alt="SP_COM_LRF_open" width="300" height="440">  
 <img src="./graphics/SP_COM_LRF_status.png" alt="SP_COM_LRF_status" width="300" height="440">  
