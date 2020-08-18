@@ -1,12 +1,12 @@
 # Laser Range Finder - Serial COM Port  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/etfovac/lrf-sp/blob/master/LICENSE)
- LRF (Laser Range Finder) controlled through Serial COM Port.
- Windows.Forms GUI (C#, .NET)
+ LRF (Laser Range Finder) controlled through Serial COM Port.  
+ Windows.Forms GUI (C# .NET)
 
 ### Keywords:
 
 > LRF,	Laser Range Finder  
 > Serial Port, COM  
-> Windows.Forms GUI (C#, .NET) 
+> Windows.Forms GUI (C# .NET) 
 
 <img src="./graphics/SP_COM_LRF_start.png" alt="SP_COM_LRF_start" width="300" height="440">  
 <img src="./graphics/SP_COM_LRF_open.png" alt="SP_COM_LRF_open" width="300" height="440">  
