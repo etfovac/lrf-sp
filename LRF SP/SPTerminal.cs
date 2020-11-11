@@ -40,29 +40,29 @@ namespace SerialPortTerminal
     #region Constructor
     public SPT()
     {
-			// Load user settings
-			settings.Reload();
+		// Load user settings
+		settings.Reload();
 
-            // Build the form
-            InitializeComponent();
+        // Build the form
+        InitializeComponent();
 
-            // Restore the users settings
-            InitializeControlValues();
+        // Restore the users settings
+        InitializeControlValues();
 
-            // Enable/disable controls based on the current state
-            EnableControls();
+        // Enable/disable controls based on the current state
+        EnableControls();
 
-            comport.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived); // When data is received, add new event
-            comport.PinChanged += new SerialPinChangedEventHandler(Comport_PinChanged);
+        comport.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived); // When data is received, add new event
+        comport.PinChanged += new SerialPinChangedEventHandler(Comport_PinChanged);
     }
 
-		void Comport_PinChanged(object sender, SerialPinChangedEventArgs e)
+	void Comport_PinChanged(object sender, SerialPinChangedEventArgs e)
 		{
 			// Show the state of the pins
 			UpdatePinState();
 		}
 
-		private void UpdatePinState()
+	private void UpdatePinState()
 		{
 			this.Invoke(new ThreadStart(() => {
 				// Show the state of the pins
