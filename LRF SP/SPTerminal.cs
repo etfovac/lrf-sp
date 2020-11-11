@@ -1,5 +1,4 @@
-/* 10.2013, 02.2014 
- * Project:    LRF Serial RS-232 COM Port Terminal
+/* Project:    LRF Serial RS-232 COM Port
  *  
  */
 
@@ -29,15 +28,14 @@ namespace SerialPortTerminal
     #region Local Variables
 
     // The main control for communicating through the RS-232 port
-    private SerialPort comport = new SerialPort();
+    private readonly SerialPort comport = new SerialPort();
 
     // Various colors for logging info
-    private Color[] LogMsgTypeColor = { Color.Blue, Color.Green, Color.Black, Color.Orange, Color.Red };
+    private readonly Color[] LogMsgTypeColor = { Color.Blue, Color.Green, Color.Black, Color.Orange, Color.Red };
 
 	private Settings settings = Settings.Default;
 
-    // DZONI 2014 ************************************************************************
-    private byte[] LRF_odgovor = new byte[12];
+    private readonly byte[] LRF_ans = new byte[12];
     private int R_min = 81; // unset R_min returns 80, so 81 is min.
 
     #endregion
@@ -57,7 +55,7 @@ namespace SerialPortTerminal
             // Enable/disable controls based on the current state
             EnableControls();
 
-            comport.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived); // When data is received, add new event
+            comport.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived); // When data is received, add new event
             comport.PinChanged += new SerialPinChangedEventHandler(comport_PinChanged);
     }
 
@@ -235,33 +233,33 @@ namespace SerialPortTerminal
     }
     #endregion
 
-    // 2014 ***********************************************************
+     #region Event Handlers; LRF Receive
 
-    #region Event Handlers; LRF Receive
-
-    private void frmTerminal_Shown(object sender, EventArgs e)
+    private void FrmTerminal_Shown(object sender, EventArgs e)
     {
       Log(LogMsgType.Normal, String.Format("Application Started at {0}\n", DateTime.Now));
     }
-    private void frmTerminal_FormClosing(object sender, FormClosingEventArgs e)
+    private void FrmTerminal_FormClosing(object sender, FormClosingEventArgs e)
     {
       // The form is closing, save the user's preferences
       SaveSettings();
     }
 
-    private void rbText_CheckedChanged(object sender, EventArgs e)
+    private void RbText_CheckedChanged(object sender, EventArgs e)
     { if (rbText.Checked) CurrentDataMode = DataMode.Text; }
 
-    private void rbHex_CheckedChanged(object sender, EventArgs e)
+    private void RbHex_CheckedChanged(object sender, EventArgs e)
     { if (rbHex.Checked) CurrentDataMode = DataMode.Hex; }
 
-    private void cmbBaudRate_Validating(object sender, CancelEventArgs e)
-    { int x; e.Cancel = !int.TryParse(cmbBaudRate.Text, out x); }
+    private void CmbBaudRate_Validating(object sender, CancelEventArgs e)
+    {
+            e.Cancel = !int.TryParse(cmbBaudRate.Text, out _); }
 
-    private void cmbDataBits_Validating(object sender, CancelEventArgs e)
-    { int x; e.Cancel = !int.TryParse(cmbDataBits.Text, out x); }
+    private void CmbDataBits_Validating(object sender, CancelEventArgs e)
+    {
+            e.Cancel = !int.TryParse(cmbDataBits.Text, out _); }
 
-    private void btnOpenPort_Click(object sender, EventArgs e)
+    private void BtnOpenPort_Click(object sender, EventArgs e)
     {
 		bool error = false;
 
@@ -276,29 +274,28 @@ namespace SerialPortTerminal
         comport.Parity = (Parity)Enum.Parse(typeof(Parity), cmbParity.Text);
         comport.PortName = cmbPortName.Text;
 
-				try
-				{
-					// Open the port
-					comport.Open();
-				}
-				catch (UnauthorizedAccessException) { error = true; }
-				catch (IOException) { error = true; }
-				catch (ArgumentException) { error = true; }
+		try
+		{
+			// Open the port
+			comport.Open();
+		}
+		catch (UnauthorizedAccessException) { error = true; }
+		catch (IOException) { error = true; }
+		catch (ArgumentException) { error = true; }
 
-				if (error) MessageBox.Show(this, "Could not open the COM port.  Most likely it is already in use, has been removed, or not available.", "COM Port not available", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-				else
-				{
-					// Show the initial pin states
-					UpdatePinState();
-					chkDTR.Checked = comport.DtrEnable;
-					chkRTS.Checked = comport.RtsEnable;
-				}
+		if (error) MessageBox.Show(this, "Could not open the COM port.  Most likely it is already in use, has been removed, or not available.", "COM Port not available", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+		else
+		{
+			// Show the initial pin states
+			UpdatePinState();
+			chkDTR.Checked = comport.DtrEnable;
+			chkRTS.Checked = comport.RtsEnable;
+		}
       }
 
       // Change the state of the form's controls
       EnableControls();
 
-      // 2014 ***************************************************************
       // If the port is open, send focus to /btnStatus/ --the send data box
       if (comport.IsOpen)
       {
@@ -317,14 +314,11 @@ namespace SerialPortTerminal
           Log(LogMsgType.Normal, "[" + dtn + "] " + "Disconnected\n");
       }
     }
-    private void btnSend_Click(object sender, EventArgs e)
+    private void BtnSend_Click(object sender, EventArgs e)
     { SendData(); }
 
 
-//**************************************************************************************************************
-   
-
-    private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+    private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
     {
 		// If the com port has been closed, do nothing
 		if (!comport.IsOpen) return;
@@ -336,11 +330,7 @@ namespace SerialPortTerminal
       {
         // Read all the data waiting in the buffer
         string data = comport.ReadExisting();
-          ////if data == "NEW_s_i_f_r_a_1"
-          //{
-                WriteOutputToTextFile(data); // related to 'Sending Files'
-          //}
-          
+        WriteOutputToTextFile(data); // related to 'Sending Files'
 
         // Display the text to the user in the terminal
         DateTime dt = DateTime.Now;
@@ -348,47 +338,44 @@ namespace SerialPortTerminal
         Log(LogMsgType.Incoming, "[" + dtn + "] " + "Received: " + data + "\n");
       }
       else 
-          
-      // 2014 ****************************************************************************************
       {
         //HEX
 
         // Obtain the number of bytes waiting in the port's buffer
-        int br_neprocitanih_bajtova = comport.BytesToRead;
-        bool stigao = false;
-        int offset = 0; // 
-          
+        int NumOfUnreadBytes = comport.BytesToRead;
+        bool Received = false;
+
         // Read Format: 
         // SerialPort.Read(buffer, offset, length)
-    
-        if (br_neprocitanih_bajtova == 12)
+
+        if (NumOfUnreadBytes == 12)
         {
-            byte[] moj_buffer = new byte[br_neprocitanih_bajtova];
-            comport.Read(moj_buffer, 0, br_neprocitanih_bajtova); //wiped after if
-            if (moj_buffer[0] == 0x5A)
+            byte[] MsgBuffer = new byte[NumOfUnreadBytes];
+            comport.Read(MsgBuffer, 0, NumOfUnreadBytes); //wiped after if
+            if (MsgBuffer[0] == 0x5A)
             {
-                Array.Copy(moj_buffer, 0, LRF_odgovor, 0, 12);
-                stigao = true;
+                Array.Copy(MsgBuffer, 0, LRF_ans, 0, 12);
+                Received = true;
                 Log(LogMsgType.Normal, "Complete ans received. Unread bytes: " + comport.BytesToRead + "\n"); 
                 btnReadStatus.Enabled = true;
                 btnReadStatus.Focus();
             }
         }
 
-        // Parse moj_buffer, ie find a complete msg
-        if (br_neprocitanih_bajtova > 12) // there's a problem if msg shorter than 12 is received
+        // Parse MsgBuffer, ie find a complete msg
+        if (NumOfUnreadBytes > 12) // there's a problem if msg shorter than 12 is received
         {
             // Create a byte array buffer to hold the incoming data
-            byte[] moj_buffer = new byte[br_neprocitanih_bajtova];
-            comport.Read(moj_buffer, 0, br_neprocitanih_bajtova);
+            byte[] MsgBuffer = new byte[NumOfUnreadBytes];
+            comport.Read(MsgBuffer, 0, NumOfUnreadBytes);
 
-            offset = Array.IndexOf(moj_buffer, (byte)0x5A);
+            int offset = Array.IndexOf(MsgBuffer, (byte)0x5A);
             if (offset >= 0) // if no 0x5a offset is -1
             {
-                if ((offset + 11) <= (moj_buffer.Length - 1))
+                if ((offset + 11) <= (MsgBuffer.Length - 1))
                 {
-                    Array.Copy(moj_buffer, offset, LRF_odgovor, 0, 12); // 12 bytes from moj_buffer to LRF_odgovor
-                    stigao = true;
+                    Array.Copy(MsgBuffer, offset, LRF_ans, 0, 12); // 12 bytes from MsgBuffer to LRF_ans
+                    Received = true;
                     Log(LogMsgType.Normal, "Complete ans received. Unread bytes: " + comport.BytesToRead + "\n"); 
                     btnReadStatus.Enabled = true;
                     btnReadStatus.Focus();
@@ -396,7 +383,7 @@ namespace SerialPortTerminal
             }
         }
 
-        if (stigao == false)
+        if (Received == false)
         {
             Log(LogMsgType.Warning, "Incomplete ans! Unread bytes: " + comport.BytesToRead + "\n");         
         }
@@ -404,7 +391,7 @@ namespace SerialPortTerminal
       }
     }
 
-    private void txtSendData_KeyDown(object sender, KeyEventArgs e)
+    private void TxtSendData_KeyDown(object sender, KeyEventArgs e)
     { 
       // If the user presses [ENTER], send the data now
       if (e.KeyCode == Keys.Enter) { e.Handled = true; SendData(); } 
@@ -437,7 +424,7 @@ namespace SerialPortTerminal
         #endregion
 
     #region Ports
-    private void tmrCheckComPorts_Tick(object sender, EventArgs e)
+    private void TmrCheckComPorts_Tick(object sender, EventArgs e)
 	{
 		// checks to see if COM ports have been added or removed
 		RefreshComPortList();
@@ -507,7 +494,7 @@ namespace SerialPortTerminal
 
     #endregion
 
-    // 2013 ***********************************************************    
+    // Files ***********************************************************    
 
     #region Sending Files
     //Sending Files ------------------
@@ -555,7 +542,7 @@ namespace SerialPortTerminal
     #endregion
 
 
-    // 2014 ***********************************************************
+    // Commands ***********************************************************
 
     #region LRF commands - SEND
 
@@ -710,8 +697,8 @@ namespace SerialPortTerminal
         rbHex.Checked = true;
 
         // Empty the COM port buffer so that LRF reply gets stored in an empty buffer
-        byte[] moj_buffer = new byte[comport.BytesToRead];
-        comport.Read(moj_buffer, 0, comport.BytesToRead);
+        byte[] MsgBuffer = new byte[comport.BytesToRead];
+        comport.Read(MsgBuffer, 0, comport.BytesToRead);
         //
         Log(LogMsgType.Normal, "Emptied Read buffer. Unread bytes: " + comport.BytesToRead + "\n"); 
 
@@ -742,49 +729,49 @@ namespace SerialPortTerminal
 
     private void btnReadStatus_Click(object sender, EventArgs e)
     {
-        // Checksum for LRF_odgovor, byte 0 not included in the sum
-        byte checksum = (byte)(   LRF_odgovor[1]
-                                + LRF_odgovor[2]
-                                + LRF_odgovor[3]
-                                + LRF_odgovor[4]
-                                + LRF_odgovor[5]
-                                + LRF_odgovor[6]
-                                + LRF_odgovor[7]
-                                + LRF_odgovor[8]
-                                + LRF_odgovor[9]
-                                + LRF_odgovor[10]
-                                + LRF_odgovor[11]);
+        // Checksum for LRF_ans, byte 0 not included in the sum
+        byte checksum = (byte)(   LRF_ans[1]
+                                + LRF_ans[2]
+                                + LRF_ans[3]
+                                + LRF_ans[4]
+                                + LRF_ans[5]
+                                + LRF_ans[6]
+                                + LRF_ans[7]
+                                + LRF_ans[8]
+                                + LRF_ans[9]
+                                + LRF_ans[10]
+                                + LRF_ans[11]);
 
             // LRF reply always starts the same and has to have checksum = 0x00
-            if (LRF_odgovor[0] == 0x5A & checksum == (byte)0x00) 
+            if (LRF_ans[0] == 0x5A & checksum == (byte)0x00) 
         {
             Log(LogMsgType.Normal, "correct checksum of LRF reply." + "\n");
 
-            if (LRF_odgovor[1] != 0xAA) // Measured 1. distance
+            if (LRF_ans[1] != 0xAA) // Measured 1. distance
             {
-                int R1 = LRF_odgovor[1] * 256 + LRF_odgovor[2];
+                int R1 = LRF_ans[1] * 256 + LRF_ans[2];
                 txtBxR1.Text = R1.ToString();
                 txtBxR1.BackColor = Color.PaleGreen;
             }
             else { txtBxR1.Text = "No echo"; }
 
-            if (LRF_odgovor[3] != 0xAA) // Measured 2. distance
+            if (LRF_ans[3] != 0xAA) // Measured 2. distance
                 {
-                int R2 = LRF_odgovor[3] * 256 + LRF_odgovor[4];
+                int R2 = LRF_ans[3] * 256 + LRF_ans[4];
                 txtBxR2.Text = R2.ToString();
                 txtBxR2.BackColor = Color.PaleGreen;
             }
             else { txtBxR2.Text = "No echo"; }
 
-            if (LRF_odgovor[5] != 0xAA) // Measured 3. distance
+            if (LRF_ans[5] != 0xAA) // Measured 3. distance
                 {
-                int R3 = LRF_odgovor[5] * 256 + LRF_odgovor[6];
+                int R3 = LRF_ans[5] * 256 + LRF_ans[6];
                 txtBxR3.Text = R3.ToString();
                 txtBxR3.BackColor = Color.PaleGreen;
             }
             else { txtBxR3.Text = "No echo"; }
 
-            switch (LRF_odgovor[7])
+            switch (LRF_ans[7])
             {
                 case 0x00: // No target or no echo
                     txtBxDistanceStatus.Text = "No target/echo"; break;
@@ -797,7 +784,7 @@ namespace SerialPortTerminal
             }
 
 
-            if ((LRF_odgovor[8] & (1 << 1 - 1)) != 0) // bit 0 - power ON/OFF
+            if ((LRF_ans[8] & (1 << 1 - 1)) != 0) // bit 0 - power ON/OFF
             { 
                 txtBxLRFStatus.AppendText("LRF ON \n");
                 btnOFF.Enabled = true;
@@ -808,7 +795,7 @@ namespace SerialPortTerminal
                 btnOFF.Enabled = false;
             }
 
-            if ((LRF_odgovor[8] & (1 << 2 - 1)) != 0) // bit 1 - charging/standby
+            if ((LRF_ans[8] & (1 << 2 - 1)) != 0) // bit 1 - charging/standby
             { 
                 txtBxLRFStatus.AppendText("charging \n");
                 btnFillC.Enabled = false;
@@ -821,7 +808,7 @@ namespace SerialPortTerminal
                 btnFIRE.Enabled = false;
             }
 
-            if ((LRF_odgovor[8] & (1 << 3 - 1)) != 0) // bit 2 - fully/not charged
+            if ((LRF_ans[8] & (1 << 3 - 1)) != 0) // bit 2 - fully/not charged
             {
                 txtBxLRFStatus.AppendText("full - can FIRE \n");
                 btnFillC.Enabled = false;
@@ -836,11 +823,11 @@ namespace SerialPortTerminal
                 btnFIRE.Enabled = false;
             }
 
-            if ((LRF_odgovor[8] & (1 << 4 - 1)) != 0) // bit 3 - unsuccessful/normal measurement
+            if ((LRF_ans[8] & (1 << 4 - 1)) != 0) // bit 3 - unsuccessful/normal measurement
             { txtBxLRFStatus.AppendText("unsuccessful meas. \n"); }
             else { txtBxLRFStatus.AppendText("normal measurement \n"); }
 
-            if (LRF_odgovor[9] == 0x00 & LRF_odgovor[10] == 0x50) 
+            if (LRF_ans[9] == 0x00 & LRF_ans[10] == 0x50) 
                 // R_min not set, returns R_min = 80; so min range is 80, not 50 as advertised (!!!)
             {
                 txtBxRminStatus.Text = "R_min not set";
@@ -849,7 +836,7 @@ namespace SerialPortTerminal
             }
             else
             {
-                int Rmin = LRF_odgovor[9] * 256 + LRF_odgovor[10];
+                int Rmin = LRF_ans[9] * 256 + LRF_ans[10];
                 txtBxRminStatus.Text = "R_min: " + Rmin.ToString();
                 txtBxRminStatus.BackColor = Color.Silver;
             }
@@ -859,8 +846,8 @@ namespace SerialPortTerminal
         Log(LogMsgType.Normal, "LRF reply stored." + "\n"); 
 
         // Empty the COM port buffer so that LRF reply gets stored in an empty buffer
-        byte[] moj_buffer = new byte[comport.BytesToRead];
-        comport.Read(moj_buffer, 0, comport.BytesToRead);
+        byte[] MsgBuffer = new byte[comport.BytesToRead];
+        comport.Read(MsgBuffer, 0, comport.BytesToRead);
         //
         Log(LogMsgType.Normal, "Read buffer cleared. Unread bytes: " + comport.BytesToRead + "\n"); 
 

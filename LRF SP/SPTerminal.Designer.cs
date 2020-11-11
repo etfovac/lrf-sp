@@ -106,7 +106,7 @@ namespace SerialPortTerminal
             this.txtSendData.Name = "txtSendData";
             this.txtSendData.Size = new System.Drawing.Size(291, 22);
             this.txtSendData.TabIndex = 2;
-            this.txtSendData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSendData_KeyDown);
+            this.txtSendData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtSendData_KeyDown);
             // 
             // btnSend
             // 
@@ -117,7 +117,7 @@ namespace SerialPortTerminal
             this.btnSend.Size = new System.Drawing.Size(100, 28);
             this.btnSend.TabIndex = 3;
             this.btnSend.Text = "Send Chat";
-            this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
+            this.btnSend.Click += new System.EventHandler(this.BtnSend_Click);
             // 
             // cmbPortName
             // 
@@ -153,7 +153,7 @@ namespace SerialPortTerminal
             this.cmbBaudRate.Name = "cmbBaudRate";
             this.cmbBaudRate.Size = new System.Drawing.Size(91, 24);
             this.cmbBaudRate.TabIndex = 3;
-            this.cmbBaudRate.Validating += new System.ComponentModel.CancelEventHandler(this.cmbBaudRate_Validating);
+            this.cmbBaudRate.Validating += new System.ComponentModel.CancelEventHandler(this.CmbBaudRate_Validating);
             // 
             // rbHex
             // 
@@ -164,7 +164,7 @@ namespace SerialPortTerminal
             this.rbHex.Size = new System.Drawing.Size(53, 21);
             this.rbHex.TabIndex = 1;
             this.rbHex.Text = "Hex";
-            this.rbHex.CheckedChanged += new System.EventHandler(this.rbHex_CheckedChanged);
+            this.rbHex.CheckedChanged += new System.EventHandler(this.RbHex_CheckedChanged);
             // 
             // rbText
             // 
@@ -175,7 +175,7 @@ namespace SerialPortTerminal
             this.rbText.Size = new System.Drawing.Size(56, 21);
             this.rbText.TabIndex = 0;
             this.rbText.Text = "Text";
-            this.rbText.CheckedChanged += new System.EventHandler(this.rbText_CheckedChanged);
+            this.rbText.CheckedChanged += new System.EventHandler(this.RbText_CheckedChanged);
             // 
             // gbMode
             // 
@@ -257,7 +257,7 @@ namespace SerialPortTerminal
             this.cmbDataBits.Name = "cmbDataBits";
             this.cmbDataBits.Size = new System.Drawing.Size(79, 24);
             this.cmbDataBits.TabIndex = 7;
-            this.cmbDataBits.Validating += new System.ComponentModel.CancelEventHandler(this.cmbDataBits_Validating);
+            this.cmbDataBits.Validating += new System.ComponentModel.CancelEventHandler(this.CmbDataBits_Validating);
             // 
             // lblStopBits
             // 
@@ -292,7 +292,7 @@ namespace SerialPortTerminal
             this.btnOpenPort.Size = new System.Drawing.Size(100, 28);
             this.btnOpenPort.TabIndex = 6;
             this.btnOpenPort.Text = "&Open Port";
-            this.btnOpenPort.Click += new System.EventHandler(this.btnOpenPort_Click);
+            this.btnOpenPort.Click += new System.EventHandler(this.BtnOpenPort_Click);
             // 
             // gbPortSettings
             // 
@@ -437,7 +437,7 @@ namespace SerialPortTerminal
             // 
             this.tmrCheckComPorts.Enabled = true;
             this.tmrCheckComPorts.Interval = 500;
-            this.tmrCheckComPorts.Tick += new System.EventHandler(this.tmrCheckComPorts_Tick);
+            this.tmrCheckComPorts.Tick += new System.EventHandler(this.TmrCheckComPorts_Tick);
             // 
             // btnSendFile
             // 
@@ -685,8 +685,8 @@ namespace SerialPortTerminal
             this.MinimumSize = new System.Drawing.Size(667, 297);
             this.Name = "SPT";
             this.Text = "Serial COM Port Terminal with LRF";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmTerminal_FormClosing);
-            this.Shown += new System.EventHandler(this.frmTerminal_Shown);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmTerminal_FormClosing);
+            this.Shown += new System.EventHandler(this.FrmTerminal_Shown);
             this.gbMode.ResumeLayout(false);
             this.gbMode.PerformLayout();
             this.gbPortSettings.ResumeLayout(false);
