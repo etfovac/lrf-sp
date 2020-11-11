@@ -78,16 +78,16 @@ namespace SerialPortTerminal
     /// <summary> Save the user's settings. </summary>
     private void SaveSettings()
     {
-			settings.BaudRate = int.Parse(cmbBaudRate.Text);
-			settings.DataBits = int.Parse(cmbDataBits.Text);
-			settings.DataMode = CurrentDataMode;
-			settings.Parity = (Parity)Enum.Parse(typeof(Parity), cmbParity.Text);
-			settings.StopBits = (StopBits)Enum.Parse(typeof(StopBits), cmbStopBits.Text);
-			settings.PortName = cmbPortName.Text;
-			settings.ClearOnOpen = chkClearOnOpen.Checked;
-			settings.ClearWithDTR = chkClearWithDTR.Checked;
+		settings.BaudRate = int.Parse(cmbBaudRate.Text);
+		settings.DataBits = int.Parse(cmbDataBits.Text);
+		settings.DataMode = CurrentDataMode;
+		settings.Parity = (Parity)Enum.Parse(typeof(Parity), cmbParity.Text);
+		settings.StopBits = (StopBits)Enum.Parse(typeof(StopBits), cmbStopBits.Text);
+		settings.PortName = cmbPortName.Text;
+		settings.ClearOnOpen = chkClearOnOpen.Checked;
+		settings.ClearWithDTR = chkClearWithDTR.Checked;
 
-			settings.Save();
+		settings.Save();
     }
 
     /// <summary> Populate the form's controls with default settings. </summary>
@@ -722,7 +722,7 @@ namespace SerialPortTerminal
 
     #region Parse received LRF reply
 
-    private void btnReadStatus_Click(object sender, EventArgs e)
+    private void BtnReadStatus_Click(object sender, EventArgs e)
     {
         // Checksum for LRF_ans, byte 0 not included in the sum
         byte checksum = (byte)(   LRF_ans[1]

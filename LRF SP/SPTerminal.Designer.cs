@@ -560,7 +560,7 @@ namespace SerialPortTerminal
             this.btnReadStatus.TabIndex = 26;
             this.btnReadStatus.Text = "Read LRF status";
             this.btnReadStatus.UseVisualStyleBackColor = true;
-            this.btnReadStatus.Click += new System.EventHandler(this.btnReadStatus_Click);
+            this.btnReadStatus.Click += new System.EventHandler(this.BtnReadStatus_Click);
             // 
             // txtBxRminStatus
             // 
