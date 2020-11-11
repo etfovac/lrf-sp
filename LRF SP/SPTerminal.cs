@@ -29,12 +29,9 @@ namespace SerialPortTerminal
 
     // The main control for communicating through the RS-232 port
     private readonly SerialPort comport = new SerialPort();
-
     // Various colors for logging info
     private readonly Color[] LogMsgTypeColor = { Color.Blue, Color.Green, Color.Black, Color.Orange, Color.Red };
-
-	private Settings settings = Settings.Default;
-
+	private readonly Settings settings = Settings.Default;
     private readonly byte[] LRF_ans = new byte[12];
     private int R_min = 81; // unset R_min returns 80, so 81 is min.
 
@@ -56,10 +53,10 @@ namespace SerialPortTerminal
             EnableControls();
 
             comport.DataReceived += new SerialDataReceivedEventHandler(Port_DataReceived); // When data is received, add new event
-            comport.PinChanged += new SerialPinChangedEventHandler(comport_PinChanged);
+            comport.PinChanged += new SerialPinChangedEventHandler(Comport_PinChanged);
     }
 
-		void comport_PinChanged(object sender, SerialPinChangedEventArgs e)
+		void Comport_PinChanged(object sender, SerialPinChangedEventArgs e)
 		{
 			// Show the state of the pins
 			UpdatePinState();
@@ -99,20 +96,18 @@ namespace SerialPortTerminal
       cmbParity.Items.Clear(); cmbParity.Items.AddRange(Enum.GetNames(typeof(Parity)));
       cmbStopBits.Items.Clear(); cmbStopBits.Items.AddRange(Enum.GetNames(typeof(StopBits)));
 
-			cmbParity.Text = settings.Parity.ToString();
-			cmbStopBits.Text = settings.StopBits.ToString();
-			cmbDataBits.Text = settings.DataBits.ToString();
-			cmbParity.Text = settings.Parity.ToString();
-			cmbBaudRate.Text = settings.BaudRate.ToString();
-			CurrentDataMode = settings.DataMode;
+	  cmbParity.Text = settings.Parity.ToString();
+	  cmbStopBits.Text = settings.StopBits.ToString();
+	  cmbDataBits.Text = settings.DataBits.ToString();
+	  cmbParity.Text = settings.Parity.ToString();
+	  cmbBaudRate.Text = settings.BaudRate.ToString();
+	  CurrentDataMode = settings.DataMode;
+      RefreshComPortList();
+      chkClearOnOpen.Checked = settings.ClearOnOpen;
+      chkClearWithDTR.Checked = settings.ClearWithDTR;
 
-			RefreshComPortList();
-
-			chkClearOnOpen.Checked = settings.ClearOnOpen;
-			chkClearWithDTR.Checked = settings.ClearWithDTR;
-
-			// select the last com port used
-			if (cmbPortName.Items.Contains(settings.PortName)) cmbPortName.Text = settings.PortName;
+	  // select the last com port used
+	  if (cmbPortName.Items.Contains(settings.PortName)) cmbPortName.Text = settings.PortName;
       else if (cmbPortName.Items.Count > 0) cmbPortName.SelectedIndex = cmbPortName.Items.Count - 1;
       else
       {
@@ -128,9 +123,8 @@ namespace SerialPortTerminal
       gbPortSettings.Enabled = !comport.IsOpen;
       txtSendData.Enabled = btnSend.Enabled = comport.IsOpen;
 
-      // DZONI 2014 ***************************************************************************
       groupBoxLRF.Enabled = comport.IsOpen;
-			//chkDTR.Enabled = chkRTS.Enabled = comport.IsOpen;
+	  //chkDTR.Enabled = chkRTS.Enabled = comport.IsOpen;
 
       if (comport.IsOpen)
       {
@@ -233,12 +227,13 @@ namespace SerialPortTerminal
     }
     #endregion
 
-     #region Event Handlers; LRF Receive
+    #region Event Handlers; LRF Receive
 
     private void FrmTerminal_Shown(object sender, EventArgs e)
     {
       Log(LogMsgType.Normal, String.Format("Application Started at {0}\n", DateTime.Now));
     }
+
     private void FrmTerminal_FormClosing(object sender, FormClosingEventArgs e)
     {
       // The form is closing, save the user's preferences
@@ -314,9 +309,9 @@ namespace SerialPortTerminal
           Log(LogMsgType.Normal, "[" + dtn + "] " + "Disconnected\n");
       }
     }
+
     private void BtnSend_Click(object sender, EventArgs e)
     { SendData(); }
-
 
     private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
     {
