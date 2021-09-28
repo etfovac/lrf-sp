@@ -1,4 +1,6 @@
-# Laser Range Finder - Serial COM Port  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/etfovac/lrf-sp/blob/master/LICENSE)
+# Laser Range Finder - Serial COM Port  
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/etfovac/lrf-sp/blob/master/LICENSE)  [![DOI](https://zenodo.org/badge/286789983.svg)](https://zenodo.org/badge/latestdoi/286789983)
+
  A simple app for LRF (Laser Range Finder) control. Based on Serial Port and Windows Forms GUI
 
 ### Keywords:
